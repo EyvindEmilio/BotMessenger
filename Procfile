@@ -1,0 +1,1 @@
+web: gunicorn simuladorTiroEjercitoBackend.wsgi --log-file -
