@@ -1,1 +1,1 @@
-web: gunicorn simuladorTiroEjercitoBackend.wsgi --log-file -
+web: gunicorn BotMessenger.wsgi --log-file -
