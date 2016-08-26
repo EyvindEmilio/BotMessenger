@@ -1,4 +1,4 @@
-dj-database-url==0.pip4.1
+dj-database-url==0.4.1
 dj-static==0.0.6
 Django==1.9.8
 gunicorn==19.6.0
