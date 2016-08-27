@@ -16,6 +16,10 @@ ACCESS_TOKEN = 'EAAZA7WeAG5PgBAHJUVeVYu82hJKwaSOZBWYLYVRYsKGmN3Up3Mj94sbOgIZCOCh
 
 @method_decorator(csrf_exempt, name='dispatch')
 class BotView(generic.View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return generic.View.dispatch(self, request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         if self.request.GET['hub.verify_token'] == 'botsoydigital':
             return HttpResponse(self.request.GET['hub.challenge'])
@@ -29,7 +33,7 @@ class BotView(generic.View):
         sender = data['entry'][0]['messaging'][0]['sender']['id']
         message = data['entry'][0]['messaging'][0]['message']['text']
         reply(sender, message[::-1])
-        return HttpResponse("oh")
+        return HttpResponse()
 
 
 class PrivacyView(generic.View):
@@ -75,4 +79,5 @@ def reply(user_id, msg):
         "message": {"text": msg}
     }
     resp = requests.post("https://graph.facebook.com/v2.6/me/messages?access_token=" + ACCESS_TOKEN, json=data)
-    print(resp.content)
+    pprint(resp.status_code)
+    pprint(resp.content)
