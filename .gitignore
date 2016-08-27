@@ -1,1 +1,10 @@
 .idea
+BotMessenger/__init__.pyc
+BotMessenger/settings.pyc
+BotMessenger/urls.pyc
+BotMessenger/wsgi.pyc
+soy_digital/__init__.pyc
+soy_digital/admin.pyc
+soy_digital/migrations/__init__.pyc
+soy_digital/models.pyc
+soy_digital/views.pyc

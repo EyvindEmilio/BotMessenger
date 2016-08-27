@@ -16,10 +16,10 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from soy_digital.views import BotView, MessageView
+from soy_digital.views import BotView, PrivacyView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^verify/', BotView.as_view()),
-    url(r'^message/', MessageView.as_view()),
+    url(r'^privacy_policies/', PrivacyView.as_view()),
 ]
