@@ -11,12 +11,37 @@ from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 import requests
 
+from soy_digital.resources.flowers import FlowersModel
+
 ACCESS_TOKEN = ''
 
 
 def post_facebook_message(fbid, recevied_message):
     post_message_url = 'https://graph.facebook.com/v2.6/me/messages?access_token=EAAZA7WeAG5PgBAHJUVeVYu82hJKwaSOZBWYLYVRYsKGmN3Up3Mj94sbOgIZCOChnjTF8vkvVP9LGreMHzer6HF0CYhzw30CWynKwDJnaDTvqEtovVJOj2rqRmzL5ikoFfVfS6gGktXzZBlkOMhrk1NH8FvZAMe8t3cl97uKCoZAgZDZD'
-    response_msg = json.dumps({"recipient": {"id": fbid}, "message": {"text": recevied_message}})
+    # response_msg = json.dumps({"recipient": {"id": fbid}, "message": {"text": recevied_message}})
+
+    list_flowers = FlowersModel.objects.all()
+    list = []
+    for flor in list_flowers:
+        list.append({
+            "title": flor.name,
+            "subtitle": flor.description,
+            "item_url": "https://botsoydigital.herokuapp.com/admin/",
+            "image_url": flor.get_image(),
+        })
+    response_msg = json.dumps({"recipient": {"id": fbid},
+                               "message":
+                                   {"text": recevied_message,
+                                    "attachment": {
+                                        "type": "template",
+                                        "payload": {
+                                            "template_type": "generic",
+                                            "elements": list
+                                        }
+                                    }
+                                    }
+                               })
+
     status = requests.post(post_message_url, headers={"Content-Type": "application/json"}, data=response_msg)
     pprint(status.json())
 
@@ -34,24 +59,11 @@ class BotView(generic.View):
 
     def post(self, request):
         incoming_message = json.loads(self.request.body.decode('utf-8'))
-        # Facebook recommends going through every entry since they might send
-        # multiple messages in a single call during high load
         for entry in incoming_message['entry']:
             for message in entry['messaging']:
                 if 'message' in message:
-                    # Print the message to the terminal
                     pprint(message)
-                    # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
-                    # are sent as attachments and must be handled accordingly.
                     post_facebook_message(message['sender']['id'], message['message']['text'])
-
-                    # data = json.loads(request.body)
-                    # pprint(data)
-                    # # return JsonResponse(data)
-                    # sender = data['entry'][0]['messaging'][0]['sender']['id']
-                    # message = data['entry'][0]['messaging'][0]['message']['text']
-                    # reply(sender, message[::-1])
-                    # return HttpResponse()
 
         return HttpResponse()
 
@@ -91,13 +103,3 @@ class PrivacyView(generic.View):
 
             """
         )
-
-
-def reply(user_id, msg):
-    data = {
-        "recipient": {"id": user_id},
-        "message": {"text": msg}
-    }
-    resp = requests.post("https://graph.facebook.com/v2.6/me/messages?access_token=" + ACCESS_TOKEN, json=data)
-    pprint(resp.status_code)
-    pprint(resp.content)
