@@ -29,7 +29,7 @@ class BotView(generic.View):
         sender = data['entry'][0]['messaging'][0]['sender']['id']
         message = data['entry'][0]['messaging'][0]['message']['text']
         reply(sender, message[::-1])
-        return "ok"
+        return HttpResponse("oh")
 
 
 class PrivacyView(generic.View):
