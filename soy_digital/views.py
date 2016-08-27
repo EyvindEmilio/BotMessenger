@@ -7,4 +7,7 @@ from django.views import generic
 
 class BotView(generic.View):
     def get(self, request, *args, **kwargs):
-        return HttpResponse("bot")
+        if self.request.GET['hub.verify_token'] == 'botsoydigital':
+            return HttpResponse(self.request.GET['hub.challenge'])
+        else:
+            return HttpResponse('Error, Access Token is Invalid!')
