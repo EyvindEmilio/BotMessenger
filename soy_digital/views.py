@@ -24,6 +24,7 @@ class BotView(generic.View):
 
     def post(self, request):
         data = json.loads(request.body)
+        pprint(data)
         # return JsonResponse(data)
         sender = data['entry'][0]['messaging'][0]['sender']['id']
         message = data['entry'][0]['messaging'][0]['message']['text']
