@@ -31,7 +31,7 @@ def post_facebook_message(fbid, recevied_message):
         })
     response_msg = json.dumps({"recipient": {"id": fbid},
                                "message":
-                                   {"text": recevied_message,
+                                   {
                                     "attachment": {
                                         "type": "template",
                                         "payload": {
