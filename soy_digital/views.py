@@ -14,7 +14,13 @@ import requests
 ACCESS_TOKEN = 'EAAZA7WeAG5PgBAHJUVeVYu82hJKwaSOZBWYLYVRYsKGmN3Up3Mj94sbOgIZCOChnjTF8vkvVP9LGreMHzer6HF0CYhzw30CWynKwDJnaDTvqEtovVJOj2rqRmzL5ikoFfVfS6gGktXzZBlkOMhrk1NH8FvZAMe8t3cl97uKCoZAgZDZD'
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+def post_facebook_message(fbid, recevied_message):
+    post_message_url = 'https://graph.facebook.com/v2.6/me/messages?access_token=<page-access-token>'
+    response_msg = json.dumps({"recipient": {"id": fbid}, "message": {"text": recevied_message}})
+    status = requests.post(post_message_url, headers={"Content-Type": "application/json"}, data=response_msg)
+    pprint(status.json())
+
+
 class BotView(generic.View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -27,12 +33,26 @@ class BotView(generic.View):
             return HttpResponse('Error, Access Token is Invalid!')
 
     def post(self, request):
-        data = json.loads(request.body)
-        pprint(data)
-        # return JsonResponse(data)
-        sender = data['entry'][0]['messaging'][0]['sender']['id']
-        message = data['entry'][0]['messaging'][0]['message']['text']
-        reply(sender, message[::-1])
+        incoming_message = json.loads(self.request.body.decode('utf-8'))
+        # Facebook recommends going through every entry since they might send
+        # multiple messages in a single call during high load
+        for entry in incoming_message['entry']:
+            for message in entry['messaging']:
+                if 'message' in message:
+                    # Print the message to the terminal
+                    pprint(message)
+                    # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
+                    # are sent as attachments and must be handled accordingly.
+                    post_facebook_message(message['sender']['id'], message['message']['text'])
+
+                    # data = json.loads(request.body)
+                    # pprint(data)
+                    # # return JsonResponse(data)
+                    # sender = data['entry'][0]['messaging'][0]['sender']['id']
+                    # message = data['entry'][0]['messaging'][0]['message']['text']
+                    # reply(sender, message[::-1])
+                    # return HttpResponse()
+
         return HttpResponse()
 
 
